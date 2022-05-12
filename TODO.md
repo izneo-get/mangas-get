@@ -1,0 +1,3 @@
+- Faire un binaire. 
+- Ajouter une fonction de crop automatique.
+- 
