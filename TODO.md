@@ -1,3 +1,3 @@
 - Faire un binaire. 
 - Ajouter une fonction de crop automatique.
-- 
+- Gérer la lecture de droite à gauche dans le CBZ.
