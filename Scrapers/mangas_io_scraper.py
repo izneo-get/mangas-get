@@ -20,6 +20,8 @@ class MangasIoScraper(Scraper):
     title: str = ""  # Titre de la série
     volume_title: str = ""  # Titre du tome
     volume_number: int = -1  # Numéro du tome
+    chapter_title: str = ""  # Titre du chapitre
+    chapter_number: int = -1  # Numéro du chapitre
     page_count: int = 0  # Nombre de pages d'après les métadonnées
     rtl: bool = False  # Sens de la lecture de droite à gauche
     authors: list = []  # Auteurs
@@ -107,6 +109,65 @@ class MangasIoScraper(Scraper):
         print("OK")
         return response.json()["token"]
 
+    def get_chapter_list(self, slug, outputfile=""):
+        json_data = {
+            'operationName': 'GetManga',
+            'variables': {
+                'slug': slug,
+            },
+            'query': 'query GetManga($slug: String) {\n  manga(slug: $slug) {\n    _id\n    slug\n    title\n    description\n    releaseDate\n    age\n    trailer\n    isOngoing\n    alternativeTitles\n    chapterCount\n    ctas {\n      url\n      image {\n        url\n        __typename\n      }\n      __typename\n    }\n    bannerMobile: banner(target: MOBILE) {\n      url\n      __typename\n    }\n    banner {\n      url\n      __typename\n    }\n    categories {\n      label\n      level\n      __typename\n    }\n    authors {\n      _id\n      name\n      __typename\n    }\n    thumbnail {\n      url\n      __typename\n    }\n    publishers {\n      publisher {\n        _id\n        name\n        countryCode\n        logo {\n          url\n          __typename\n        }\n        __typename\n      }\n      releaseDate\n      __typename\n    }\n    volumes {\n      _id\n      title\n      ean13\n      label\n      description\n      number\n      publicationDate\n      releaseDate\n      thumbnail {\n        url\n        pos_x\n        pos_y\n        __typename\n      }\n      chapterStart\n      chapterEnd\n      chapters {\n        _id\n        number\n        title\n        isRead\n        isBonus\n        isSeparator\n        access\n        publicationDate\n        releaseDate\n        pageCount\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}',
+        }
+        response = requests.post('https://api.mangas.io/api', headers=self.headers, json=json_data)
+        if response.status_code != 200:
+            print(f"Erreur : {response.status_code}")
+            return False
+        data = response.json()
+        self.title = data["data"]["manga"]["title"]
+        for volume in data["data"]["manga"]["volumes"]:
+            self.volume_title = volume["title"]
+            self.volume_number = volume["number"]
+            for chapter in volume["chapters"]:
+                self.chapter_title = chapter["title"]
+                self.chapter_number = chapter["number"]
+                title_used = self.get_title()
+                if not outputfile:
+                    print(f"# {title_used}")
+                else:
+                    with open(outputfile, "a", encoding='utf-8') as f:
+                        f.write(f"# {title_used}\n")
+                if not chapter['isSeparator']:
+                    if not outputfile:
+                        print(f"https://www.mangas.io/lire/{slug}/{chapter['number']}/1")
+                    else:
+                        with open(outputfile, "a", encoding='utf-8') as f:
+                            f.write(f"https://www.mangas.io/lire/{slug}/{chapter['number']}/1\n")
+
+
+    def get_title(self):
+        title_used = self.title
+        if isinstance(self.volume_number, int):
+            volume_number = f"{self.volume_number:02d}"
+        else:
+            volume_number = f"{int(self.volume_number):02d}" + '.' + str(self.volume_number).split(".")[-1]
+        if isinstance(self.chapter_number, int):
+            chapter_number = f"{self.chapter_number:02d}"
+        else:
+            chapter_number = f"{int(self.chapter_number):02d}" + '.' + str(self.chapter_number).split(".")[-1]
+
+        if self.chapter_title:
+            title_used = self.title + " - " + self.chapter_title
+        if self.chapter_number >= 0:
+            title_used = self.title + " - " + chapter_number
+        if self.chapter_number >= 0 and self.volume_number >= 0:
+            title_used = self.title + " - " + f"{volume_number}x{chapter_number}"
+        if self.chapter_title and self.chapter_number >= 0:
+            title_used = self.title + " - " + f"{chapter_number}" + ". " + self.chapter_title
+        if self.chapter_title and self.chapter_number >= 0 and self.volume_number >= 0:
+            title_used = self.title + " - " + f"{volume_number}x{chapter_number}" + ". " + self.chapter_title
+
+        return title_used
+
+
     def download(
         self,
         url,
@@ -128,14 +189,7 @@ class MangasIoScraper(Scraper):
             print(f"Attention : {self.page_count} pages attendues, mais {len(self.pages)} annoncées")
             if full_only:
                 return False
-        title_used = self.title
-        if self.volume_title:
-            title_used = self.title + " - " + self.volume_title
-        if self.volume_number >= 0:
-            title_used = self.title + " - " + f"{self.volume_number:02d}"
-        if self.volume_title and self.volume_number >= 0:
-            title_used = self.title + " - " + f"{self.volume_number:02d}" + ". " + self.volume_title
-
+        title_used = self.get_title()
         if force_title:
             print(
                 'Téléchargement de "'
@@ -181,8 +235,8 @@ class MangasIoScraper(Scraper):
         data = response.json()
         if data:
             self.title = data["data"]["manga"]["title"]
-            self.volume_title = data["data"]["manga"]["chapter"]["title"]
-            self.volume_number = data["data"]["manga"]["chapter"]["number"]
+            self.chapter_title = data["data"]["manga"]["chapter"]["title"]
+            self.chapter_number = data["data"]["manga"]["chapter"]["number"]
             self.page_count = data["data"]["manga"]["chapter"]["pageCount"]
             self.rtl = data["data"]["manga"]["direction"] == "rtl"
             self.authors = [author["name"] for author in data["data"]["manga"]["authors"]]

@@ -8,10 +8,10 @@ Il est évident que les BD ne doivent en aucun cas être conservées une fois la
 ## Utilisation
 ```
 python mangas_get.py [-h] [--login LOGIN] [--password PASSWORD] [--output-folder OUTPUT_FOLDER]
-                     [--output-format {cbz,img,both}] [--config CONFIG] [--from-page FROM_PAGE] [--limit LIMIT]
+                     [--output-format {cbz,both,img}] [--config CONFIG] [--from-page FROM_PAGE] [--limit LIMIT]
                      [--pause PAUSE] [--full-only] [--continue] [--user-agent USER_AGENT]
                      [--convert-images {webp,jpeg,original}] [--convert-quality CONVERT_QUALITY] [--smart-crop]
-                     [--force-title FORCE_TITLE]
+                     [--force-title FORCE_TITLE] [--list] [--list-write LIST_WRITE]
                      [url]
 
 Script pour sauvegarder une BD Mangas.io.
@@ -27,7 +27,7 @@ optional arguments:
                         Le mot de passe sur le site
   --output-folder OUTPUT_FOLDER, -o OUTPUT_FOLDER
                         Répertoire racine de téléchargement
-  --output-format {cbz,img,both}, -f {cbz,img,both}
+  --output-format {cbz,both,img}, -f {cbz,both,img}
                         Format de sortie
   --config CONFIG       Fichier de configuration
   --from-page FROM_PAGE
@@ -45,9 +45,13 @@ optional arguments:
   --smart-crop          Supprimer les bords blancs des images (avec --convert-images uniquement)
   --force-title FORCE_TITLE
                         Le titre à utiliser dans les noms de fichier, à la place de celui trouvé sur la page
+  --list                Liste les URLs des chapitres disponibles (option exclusive)
+  --list-write LIST_WRITE
+                        Liste les URLs des chapitres disponibles et les enregistre dans un fichier texte (option
+                        exclusive)
 ```
 
-Exemple :  
+### Exemples  
 Pour récupérer la BD dans un répertoire d'images + CBZ, en conservant le format et la qualité d'image originale (fichier de config présent) :  
 ```
 python mangas_get.py https://www.mangas.io/lire/naruto/1/1
@@ -62,6 +66,16 @@ python mangas_get.py https://www.mangas.io/lire/naruto/1/1 --output-format cbz -
 Pour récupérer la BD dans une archive CBZ uniquement, avec des images converties en JPEG (fichier de config présent) :  
 ```
 python mangas_get.py https://www.mangas.io/lire/naruto/1/1 --output-format cbz --convert-images jpeg --convert-quality 70
+```
+
+Pour récuper la liste de toutes les URLs d'une série et la stocker dans un fichier : 
+```
+python mangas_get.py https://www.mangas.io/lire/naruto --list-write naruto.txt
+```
+
+Pour télécharger toutes les BD listées dans un fichier : 
+```
+python mangas_get.py naruto.txt 
 ```
 
 

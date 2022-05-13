@@ -122,6 +122,18 @@ if __name__ == "__main__":
         default=None,
         help="Le titre à utiliser dans les noms de fichier, à la place de celui trouvé sur la page",
     )
+    parser.add_argument(
+        "--list",
+        action="store_true",
+        default=False,
+        help="Liste les URLs des chapitres disponibles (option exclusive)",
+    )
+    parser.add_argument(
+        "--list-write",
+        type=str,
+        default=None,
+        help="Liste les URLs des chapitres disponibles et les enregistre dans un fichier texte (option exclusive)",
+    )
     args = parser.parse_args()
 
     # Vérification que c'est la dernière version.
@@ -164,6 +176,8 @@ if __name__ == "__main__":
     convert_quality = args.convert_quality
     output_format = args.output_format
     smart_crop = args.smart_crop
+    get_list = args.list
+    get_list_file = args.list_write
     
     while not os.path.isfile(url) and not url.lower().startswith("http"):
         url = input("URL de la BD ou fichier : ")
@@ -174,7 +188,7 @@ if __name__ == "__main__":
         #     with open(url, "r", encoding=encoding) as f:
         #         lines = f.readlines()
         # else:
-        with open(url, "r") as f:
+        with open(url, "r", encoding='utf-8') as f:
             lines = f.readlines()
         next_forced_title = ""
         for line in lines:
@@ -196,6 +210,16 @@ if __name__ == "__main__":
         url = url[0]
 
         scraper = MangasIoScraper(login_email=login, password=password, user_agent=user_agent)
+        if get_list:
+            slug = url.split("/")[-1]
+            scraper.get_chapter_list(slug)
+            continue
+        if get_list_file:
+            slug = url.split("/")[-1]
+            os.remove(get_list_file)
+            scraper.get_chapter_list(slug, get_list_file)
+            print(f"Fichier \"{get_list_file}\" créé.")
+            continue
         result = scraper.download(
             url,
             force_title=force_title,
@@ -206,6 +230,9 @@ if __name__ == "__main__":
             nb_page_limit=nb_page_limit,
             full_only=full_only,
         )
+
+        if not result:
+            continue
 
         if convert_images in ("jpeg", "webp"):
             scraper.convert_images(result, convert_images, convert_quality, smart_crop)
