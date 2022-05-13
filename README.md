@@ -8,9 +8,9 @@ Il est évident que les BD ne doivent en aucun cas être conservées une fois la
 ## Utilisation
 ```
 python mangas_get.py [-h] [--login LOGIN] [--password PASSWORD] [--output-folder OUTPUT_FOLDER]
-                     [--output-format {both,img,cbz}] [--config CONFIG] [--from-page FROM_PAGE] [--limit LIMIT]
+                     [--output-format {cbz,img,both}] [--config CONFIG] [--from-page FROM_PAGE] [--limit LIMIT]
                      [--pause PAUSE] [--full-only] [--continue] [--user-agent USER_AGENT]
-                     [--convert-images {original,webp,jpeg}] [--convert-quality CONVERT_QUALITY]
+                     [--convert-images {webp,jpeg,original}] [--convert-quality CONVERT_QUALITY] [--smart-crop]
                      [--force-title FORCE_TITLE]
                      [url]
 
@@ -27,7 +27,7 @@ optional arguments:
                         Le mot de passe sur le site
   --output-folder OUTPUT_FOLDER, -o OUTPUT_FOLDER
                         Répertoire racine de téléchargement
-  --output-format {both,img,cbz}, -f {both,img,cbz}
+  --output-format {cbz,img,both}, -f {cbz,img,both}
                         Format de sortie
   --config CONFIG       Fichier de configuration
   --from-page FROM_PAGE
@@ -38,10 +38,11 @@ optional arguments:
   --continue            Pour reprendre là où on en était. Par défaut, on écrase les fichiers existants.
   --user-agent USER_AGENT
                         User agent à utiliser
-  --convert-images {original,webp,jpeg}
+  --convert-images {webp,jpeg,original}
                         Conversion en JPEG ou WEBP
   --convert-quality CONVERT_QUALITY
                         Qualité de la conversion en JPEG ou WEBP
+  --smart-crop          Supprimer les bords blancs des images (avec --convert-images uniquement)
   --force-title FORCE_TITLE
                         Le titre à utiliser dans les noms de fichier, à la place de celui trouvé sur la page
 ```

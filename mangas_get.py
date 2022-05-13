@@ -7,7 +7,7 @@ import sys
 import shutil
 import requests
 
-__VERSION__ = "1.00.00"
+__VERSION__ = "1.01.00"
 
 def check_version():
     latest_version_url = (
@@ -111,6 +111,12 @@ if __name__ == "__main__":
         help="Qualité de la conversion en JPEG ou WEBP",
     )
     parser.add_argument(
+        "--smart-crop",
+        action="store_true",
+        default=False,
+        help="Supprimer les bords blancs des images (avec --convert-images uniquement)",
+    )
+    parser.add_argument(
         "--force-title",
         type=str,
         default=None,
@@ -157,6 +163,7 @@ if __name__ == "__main__":
     convert_images = args.convert_images
     convert_quality = args.convert_quality
     output_format = args.output_format
+    smart_crop = args.smart_crop
     
     while not os.path.isfile(url) and not url.lower().startswith("http"):
         url = input("URL de la BD ou fichier : ")
@@ -201,7 +208,7 @@ if __name__ == "__main__":
         )
 
         if convert_images in ("jpeg", "webp"):
-            scraper.convert_images(result, convert_images, convert_quality)
+            scraper.convert_images(result, convert_images, convert_quality, smart_crop)
 
         if output_format in ("cbz", "both"):
             scraper.create_cbz(result)
