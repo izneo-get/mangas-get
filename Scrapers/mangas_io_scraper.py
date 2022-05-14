@@ -83,7 +83,7 @@ class MangasIoScraper(Scraper):
         json_data = {
             "token": self.bearer,
         }
-        response = requests.post("https://api.mangas.io/auth/token_validation", headers=self.headers, json=json_data)
+        response = requests.post("https://api.mangas.io/auth/token_validation", headers=self.headers, json=json_data, allow_redirects=True)
         if response.status_code != 200:
             print("Erreur :", response.status_code)
             return False
@@ -102,7 +102,7 @@ class MangasIoScraper(Scraper):
             "password": password,
         }
 
-        response = requests.post("https://api.mangas.io/auth/login", headers=self.headers, json=json_data)
+        response = requests.post("https://api.mangas.io/auth/login", headers=self.headers, json=json_data, allow_redirects=True)
         if response.status_code != 200:
             print("Erreur :", response.status_code)
             return ""
@@ -117,7 +117,7 @@ class MangasIoScraper(Scraper):
             },
             'query': 'query GetManga($slug: String) {\n  manga(slug: $slug) {\n    _id\n    slug\n    title\n    description\n    releaseDate\n    age\n    trailer\n    isOngoing\n    alternativeTitles\n    chapterCount\n    ctas {\n      url\n      image {\n        url\n        __typename\n      }\n      __typename\n    }\n    bannerMobile: banner(target: MOBILE) {\n      url\n      __typename\n    }\n    banner {\n      url\n      __typename\n    }\n    categories {\n      label\n      level\n      __typename\n    }\n    authors {\n      _id\n      name\n      __typename\n    }\n    thumbnail {\n      url\n      __typename\n    }\n    publishers {\n      publisher {\n        _id\n        name\n        countryCode\n        logo {\n          url\n          __typename\n        }\n        __typename\n      }\n      releaseDate\n      __typename\n    }\n    volumes {\n      _id\n      title\n      ean13\n      label\n      description\n      number\n      publicationDate\n      releaseDate\n      thumbnail {\n        url\n        pos_x\n        pos_y\n        __typename\n      }\n      chapterStart\n      chapterEnd\n      chapters {\n        _id\n        number\n        title\n        isRead\n        isBonus\n        isSeparator\n        access\n        publicationDate\n        releaseDate\n        pageCount\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}',
         }
-        response = requests.post('https://api.mangas.io/api', headers=self.headers, json=json_data)
+        response = requests.post('https://api.mangas.io/api', headers=self.headers, json=json_data, allow_redirects=True)
         if response.status_code != 200:
             print(f"Erreur : {response.status_code}")
             return False
@@ -228,7 +228,7 @@ class MangasIoScraper(Scraper):
             },
             "query": "query getReadingChapter($slug: String, $chapterNb: Float) {\n  manga(slug: $slug) {\n    _id\n    title\n    contentWarning\n    direction\n    authors {\n      _id\n      name\n      __typename\n    }\n    volumes {\n      _id\n      number\n      description\n      chapters {\n        _id\n        title\n        number\n        isRead\n        isSeparator\n        releaseDate\n        __typename\n      }\n      __typename\n    }\n    chapter(number: $chapterNb) {\n      _id\n      number\n      title\n      releaseDate\n      pageCount\n      access\n      copyright\n      pages {\n        _id\n        isDoublePage\n        number\n        image {\n          meta {\n            width\n            height\n            blurhash\n            ratio\n            __typename\n          }\n          __typename\n        }\n        __typename\n      }\n      next {\n        _id\n        title\n        number\n        releaseDate\n        access\n        __typename\n      }\n      previous {\n        _id\n        title\n        number\n        pageCount\n        releaseDate\n        access\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}",
         }
-        response = requests.post("https://api.mangas.io/api", headers=headers, json=json_data)
+        response = requests.post("https://api.mangas.io/api", headers=headers, json=json_data, allow_redirects=True)
         if response.status_code != 200:
             print(f"Erreur : {response.status_code}")
             return False
@@ -267,7 +267,7 @@ class MangasIoScraper(Scraper):
             "query": "query getPageById($id: ID!, $quality: PageType) {\n  page(id: $id) {\n    _id\n    isDoublePage\n    image(type: $quality) {\n      url\n      __typename\n    }\n    __typename\n  }\n}",
         }
 
-        response = requests.post("https://api.mangas.io/api", headers=headers, json=json_data)
+        response = requests.post("https://api.mangas.io/api", headers=headers, json=json_data, allow_redirects=True)
         if response.status_code != 200:
             print(f"Error: {response.status_code}")
             return False
