@@ -216,7 +216,8 @@ if __name__ == "__main__":
             continue
         if get_list_file:
             slug = url.split("/")[-1]
-            os.remove(get_list_file)
+            if os.path.isfile(get_list_file):
+                os.remove(get_list_file)
             scraper.get_chapter_list(slug, get_list_file)
             print(f"Fichier \"{get_list_file}\" créé.")
             continue
