@@ -85,8 +85,6 @@ python mangas_get.py naruto.txt
 - Python 3.9+ (non testé avec les versions précédentes)
 - pip (désormais inclus avec Python)
 - Librairies SSL
-- Drivers Chrome (pour la version "Selenium")
-- Chrome (pour la version "Selenium")
 
 #### Sous Windows
 ##### Python
