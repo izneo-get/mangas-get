@@ -95,7 +95,7 @@ class MangasIoScraper(Scraper):
         if not login_email:
             login_email = input("Email de connexion : ")
         if not password:
-            password = getpass("Mot de passe : ")
+            password = getpass("Mot de passe (ne sera pas affiché lors de la saisie) : ")
 
         json_data = {
             "email": login_email,
