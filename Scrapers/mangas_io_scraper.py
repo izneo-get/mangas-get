@@ -185,6 +185,9 @@ class MangasIoScraper(Scraper):
 
         """ Télécharge la BD """
         self.get_pages()
+        if not self.pages:
+            print("Erreur : Aucune page trouvée")
+            return False
         if len(self.pages) != self.page_count:
             print(f"Attention : {self.page_count} pages attendues, mais {len(self.pages)} annoncées")
             if full_only:
