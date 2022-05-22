@@ -1,2 +1,1 @@
-- Faire un binaire. 
-- Gérer la lecture de droite à gauche dans le CBZ.
+- Gérer la lecture de droite à gauche dans le CBZ. 

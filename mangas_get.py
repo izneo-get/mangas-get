@@ -7,7 +7,7 @@ import sys
 import shutil
 import requests
 
-__VERSION__ = "1.01.02"
+__VERSION__ = "1.02.00"
 
 def check_version():
     latest_version_url = (
@@ -47,6 +47,12 @@ if __name__ == "__main__":
         default=None,
         help="L'identifiant (email) sur le site",
     )
+    parser.add_argument(
+        "--force-login",
+        action="store_true",
+        default=False,
+        help="Ne lit pas le token en cache et force une authentification",
+    )
     parser.add_argument("--password", "-p", type=str, default=None, help="Le mot de passe sur le site")
     parser.add_argument(
         "--output-folder",
@@ -55,7 +61,6 @@ if __name__ == "__main__":
         default=None,
         help="Répertoire racine de téléchargement",
     )
-
     parser.add_argument(
         "--output-format",
         "-f",
@@ -170,6 +175,7 @@ if __name__ == "__main__":
     from_page = args.from_page
     nb_page_limit = args.limit
     full_only = args.full_only
+    force_login = args.force_login
     force_title = args.force_title
     overwrite_if_exists = not args.continue_from_existing
     convert_images = args.convert_images
@@ -205,11 +211,11 @@ if __name__ == "__main__":
     else:
         url_list.append([url, force_title])
 
+    scraper = MangasIoScraper(login_email=login, password=password, user_agent=user_agent, force_login=force_login)
     for url in url_list:
         force_title = url[1]
         url = url[0]
 
-        scraper = MangasIoScraper(login_email=login, password=password, user_agent=user_agent)
         if get_list:
             slug = url.split("/")[-1]
             scraper.get_chapter_list(slug)
