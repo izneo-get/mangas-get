@@ -188,8 +188,8 @@ class MangasIoScraper(Scraper):
         full_only=False,
     ):
         self.url = url
-        self.slug, self.chapter_nb = re.search("https://www.mangas.io/lire/([^/]+)/([\d]+)", self.url).groups()
-        self.chapter_nb = int(self.chapter_nb)
+        self.slug, self.chapter_nb = re.search("https://www.mangas.io/lire/([^/]+)/([\d\.]+)", self.url).groups()
+        self.chapter_nb = float(self.chapter_nb)
 
         """ Télécharge la BD """
         self.get_pages()
