@@ -88,23 +88,25 @@ Pour voir les informations d'un chapitre :
 python mangas_get.py https://www.mangas.io/lire/naruto --infos
 ```
 retournera 
-> Champ                      Tag              Valeur
-> -------------------------  ---------------  -------------------------------------------
-> URL                        %url%            https://www.mangas.io/lire/naruto/1/1
-> Slug                       %slug%           naruto
-> Titre                      %title%          Naruto
-> Sens de lecture            %direction%      rtol
-> Auteur                     %author%         KISHIMOTO Masashi
-> Volume                     %volume%         1
-> Volume                     %volume_2d%      01
-> Volume                     %volume_3d%      001
-> Numéro de chapitre         %chapter%        1
-> Numéro de chapitre         %chapter_2d%     01
-> Numéro de chapitre         %chapter_3d%     001
-> Chapitre                   %chapter_title%  Chap.01 : Naruto Uzumaki !!
-> Nombre de pages            %pages%          55
-> Nom du fichier par défaut  %default%        Naruto - 01x01. Chap.01 : Naruto Uzumaki !!
-> Description : Naruto est un garçon un peu spécial. Il est toujours tout seul et son caractère fougueux ne l'aide pas vraiment à se faire apprécier dans son village. Malgré cela, il garde au fond de lui une ambition: celle de devenir un maître Hokage, la plus haute distinction dans l'ordre des ninjas, et ainsi obtenir la reconnaissance de ses pairs...
+```
+Champ                      Tag              Valeur
+-------------------------  ---------------  -------------------------------------------
+URL                        %url%            https://www.mangas.io/lire/naruto/1/1
+Slug                       %slug%           naruto
+Titre                      %title%          Naruto
+Sens de lecture            %direction%      rtol
+Auteur                     %author%         KISHIMOTO Masashi
+Volume                     %volume%         1
+Volume                     %volume_2d%      01
+Volume                     %volume_3d%      001
+Numéro de chapitre         %chapter%        1
+Numéro de chapitre         %chapter_2d%     01
+Numéro de chapitre         %chapter_3d%     001
+Chapitre                   %chapter_title%  Chap.01 : Naruto Uzumaki !!
+Nombre de pages            %pages%          55
+Nom du fichier par défaut  %default%        Naruto - 01x01. Chap.01 : Naruto Uzumaki !!
+Description : Naruto est un garçon un peu spécial. Il est toujours tout seul et son caractère fougueux ne l'aide pas vraiment à se faire apprécier dans son village. Malgré cela, il garde au fond de lui une ambition: celle de devenir un maître Hokage, la plus haute distinction dans l'ordre des ninjas, et ainsi obtenir la reconnaissance de ses pairs...
+```
 
 
 ## Installation
