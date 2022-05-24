@@ -118,7 +118,7 @@ class MangasIoScraper(Scraper):
         print("OK")
         return response.json()["token"]
 
-    def get_chapter_list(self, slug, outputfile=""):
+    def get_chapter_list(self, slug, outputfile="", force_title=""):
         json_data = {
             "operationName": "GetManga",
             "variables": {
@@ -134,13 +134,50 @@ class MangasIoScraper(Scraper):
             return False
         data = response.json()
         self.title = data["data"]["manga"]["title"]
+        self.authors = [author["name"] for author in data["data"]["manga"]["authors"]]
         for volume in data["data"]["manga"]["volumes"]:
             self.volume_title = volume["title"]
             self.volume_number = volume["number"]
+            if isinstance(self.volume_number, int):
+                volume_number_2 = f"{self.volume_number:02d}"
+                volume_number_3 = f"{self.volume_number:03d}"
+            else:
+                volume_number_2 = f"{int(self.volume_number):02d}" + "." + str(self.volume_number).split(".")[-1]
+                volume_number_3 = f"{int(self.volume_number):03d}" + "." + str(self.volume_number).split(".")[-1]
             for chapter in volume["chapters"]:
                 self.chapter_title = chapter["title"]
                 self.chapter_number = chapter["number"]
+                self.page_count = chapter["number"]
+
+                if isinstance(self.chapter_number, int):
+                    chapter_number_2 = f"{self.chapter_number:02d}"
+                    chapter_number_3 = f"{self.chapter_number:03d}"
+                else:
+                    chapter_number_2 = f"{int(self.chapter_number):02d}" + "." + str(self.chapter_number).split(".")[-1]
+                    chapter_number_3 = f"{int(self.chapter_number):03d}" + "." + str(self.chapter_number).split(".")[-1]
+
+
                 title_used = self.get_title()
+                direction = "?"
+                authors = ", ".join(self.authors)
+                self.infos = []
+                self.infos.append(["URL", "%url%", self.url])
+                self.infos.append(["Slug", "%slug%", slug])
+                self.infos.append(["Titre", "%title%", self.title])
+                self.infos.append(["Sens de lecture", "%direction%", direction])
+                self.infos.append(["Auteur", "%author%", authors])
+                self.infos.append(["Volume", "%volume%", self.volume_number])
+                self.infos.append(["Volume", "%volume_2d%", volume_number_2])
+                self.infos.append(["Volume", "%volume_3d%", volume_number_3])
+                self.infos.append(["Numéro de chapitre", "%chapter%", self.chapter_number])
+                self.infos.append(["Numéro de chapitre", "%chapter_2d%", chapter_number_2])
+                self.infos.append(["Numéro de chapitre", "%chapter_3d%", chapter_number_3])
+                self.infos.append(["Chapitre", "%chapter_title%", self.chapter_title])
+                self.infos.append(["Nombre de pages", "%pages%", self.page_count])
+                self.infos.append(["Nom du fichier par défaut", "%default%", self.get_title()])
+                
+                if force_title:
+                    title_used = self.replace_title(force_title)
                 if not outputfile:
                     print(f"# {title_used}")
                 else:
@@ -193,6 +230,13 @@ class MangasIoScraper(Scraper):
 
         return True
 
+    def replace_title(self, title):
+        new_title = title.replace("/", "¤")
+        for elem in self.infos:
+            new_title = new_title.replace(elem[1], str(elem[2]))
+        new_title = Scrapers.scraper.clean_name(new_title)
+        new_title = new_title.replace("¤", "/")
+        return new_title
 
     def download(
         self,
@@ -219,19 +263,24 @@ class MangasIoScraper(Scraper):
             if full_only:
                 return False
         title_used = self.get_title()
+        folder_used = title_used
         if force_title:
+            new_title = self.replace_title(force_title)
             print(
                 'Téléchargement de "'
                 + Scrapers.scraper.clean_name(title_used)
                 + '" en tant que "'
-                + Scrapers.scraper.clean_name(force_title)
+                + new_title
                 + '"'
             )
-            title_used = Scrapers.scraper.clean_name(force_title)
+            title_used = new_title.split('/')[-1]
+            folder_used = title_used
+            if '/' in new_title:
+                folder_used = '/'.join(new_title.split('/')[:-1])
         else:
             title_used = Scrapers.scraper.clean_name(title_used)
             print('Téléchargement de "' + title_used + '"')
-        save_path = f"{output_folder}/{title_used}"
+        save_path = f"{output_folder}/{folder_used}"
         progress_bar = ""
         for page in self.pages:
             if page < from_page or page >= from_page + nb_page_limit:
@@ -263,46 +312,65 @@ class MangasIoScraper(Scraper):
             return False
         data = response.json()
         if data:
-            self.title = data["data"]["manga"]["title"]
-            self.rtl = data["data"]["manga"]["direction"] == "rtl"
-            self.authors = [author["name"] for author in data["data"]["manga"]["authors"]]
-            chapter_id = data["data"]["manga"]["chapter"]["_id"]
-            volume = None
-            self.volume_number = 0
-            self.volume_description = ""
-            for v in data["data"]["manga"]["volumes"]:
-                for c in v["chapters"]:
-                    if c["_id"] == chapter_id:
-                        volume = v
-                        break
-            if volume:
-                self.volume_number = volume["number"]
-                self.volume_description = volume["description"]
-            self.chapter_title = data["data"]["manga"]["chapter"]["title"]
-            self.chapter_number = data["data"]["manga"]["chapter"]["number"]
-            self.page_count = data["data"]["manga"]["chapter"]["pageCount"]
-            self.pages = {}
-            if data["data"]["manga"]["chapter"]["pages"]:
-                self.pages = {page["number"]: page["_id"] for page in data["data"]["manga"]["chapter"]["pages"]}
-
-            direction = "rtol" if self.rtl else "ltor"
-            authors = ", ".join(self.authors)
-            self.infos = []
-            self.infos.append(["URL", "%url%", self.url])
-            self.infos.append(["Slug", "%slug%", self.slug])
-            self.infos.append(["Titre", "%title%", self.title])
-            self.infos.append(["Sens de lecture", "%direction%", direction])
-            self.infos.append(["Auteur", "%author%", authors])
-            self.infos.append(["Volume", "%volume%", self.volume_number])
-            self.infos.append(["Volume", "%volume_2d%", f"{self.volume_number:02d}"])
-            self.infos.append(["Volume", "%volume_3d%", f"{self.volume_number:03d}"])
-            self.infos.append(["Numéro de chapitre", "%chapter%", self.chapter_number])
-            self.infos.append(["Numéro de chapitre", "%chapter_2d%", f"{self.chapter_number:02d}"])
-            self.infos.append(["Numéro de chapitre", "%chapter_3d%", f"{self.chapter_number:03d}"])
-            self.infos.append(["Chapitre", "%chapter_title%", self.chapter_title])
-            self.infos.append(["Nombre de pages", "%pages%", self.page_count])
-            self.infos.append(["Nom du fichier par défaut", "", self.get_title()])
+            self.fill_infos(data)
         return True
+
+
+    def fill_infos(self, data):
+        self.title = data["data"]["manga"]["title"]
+        self.rtl = data["data"]["manga"]["direction"] == "rtl"
+        self.authors = [author["name"] for author in data["data"]["manga"]["authors"]]
+        chapter_id = data["data"]["manga"]["chapter"]["_id"]
+        volume = None
+        self.volume_number = 0
+        self.volume_description = ""
+        for v in data["data"]["manga"]["volumes"]:
+            for c in v["chapters"]:
+                if c["_id"] == chapter_id:
+                    volume = v
+                    break
+        if volume:
+            self.volume_number = volume["number"]
+            self.volume_description = volume["description"]
+        self.chapter_title = data["data"]["manga"]["chapter"]["title"]
+        self.chapter_number = data["data"]["manga"]["chapter"]["number"]
+        self.page_count = data["data"]["manga"]["chapter"]["pageCount"]
+        self.pages = {}
+        if data["data"]["manga"]["chapter"]["pages"]:
+            self.pages = {page["number"]: page["_id"] for page in data["data"]["manga"]["chapter"]["pages"]}
+
+        if isinstance(self.volume_number, int):
+            volume_number_2 = f"{self.volume_number:02d}"
+            volume_number_3 = f"{self.volume_number:03d}"
+        else:
+            volume_number_2 = f"{int(self.volume_number):02d}" + "." + str(self.volume_number).split(".")[-1]
+            volume_number_3 = f"{int(self.volume_number):03d}" + "." + str(self.volume_number).split(".")[-1]
+
+        if isinstance(self.chapter_number, int):
+            chapter_number_2 = f"{self.chapter_number:02d}"
+            chapter_number_3 = f"{self.chapter_number:03d}"
+        else:
+            chapter_number_2 = f"{int(self.chapter_number):02d}" + "." + str(self.chapter_number).split(".")[-1]
+            chapter_number_3 = f"{int(self.chapter_number):03d}" + "." + str(self.chapter_number).split(".")[-1]
+    
+        direction = "rtol" if self.rtl else "ltor"
+        authors = ", ".join(self.authors)
+        self.infos = []
+        self.infos.append(["URL", "%url%", self.url])
+        self.infos.append(["Slug", "%slug%", self.slug])
+        self.infos.append(["Titre", "%title%", self.title])
+        self.infos.append(["Sens de lecture", "%direction%", direction])
+        self.infos.append(["Auteur", "%author%", authors])
+        self.infos.append(["Volume", "%volume%", self.volume_number])
+        self.infos.append(["Volume", "%volume_2d%", volume_number_2])
+        self.infos.append(["Volume", "%volume_3d%", volume_number_3])
+        self.infos.append(["Numéro de chapitre", "%chapter%", self.chapter_number])
+        self.infos.append(["Numéro de chapitre", "%chapter_2d%", chapter_number_2])
+        self.infos.append(["Numéro de chapitre", "%chapter_3d%", chapter_number_3])
+        self.infos.append(["Chapitre", "%chapter_title%", self.chapter_title])
+        self.infos.append(["Nombre de pages", "%pages%", self.page_count])
+        self.infos.append(["Nom du fichier par défaut", "%default%", self.get_title()])
+        return
 
     def download_page(
         self,

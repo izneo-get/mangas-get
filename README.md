@@ -7,9 +7,11 @@ Il est évident que les BD ne doivent en aucun cas être conservées une fois la
 
 ## Utilisation
 ```
-python mangas_get.py [-h] [--login LOGIN] [--force-login] [--password PASSWORD] [--output-folder OUTPUT_FOLDER] [--output-format {cbz,img,both}] [--config CONFIG] [--from-page FROM_PAGE] [--limit LIMIT]
-                     [--pause PAUSE] [--full-only] [--continue] [--user-agent USER_AGENT] [--convert-images {webp,original,jpeg}] [--convert-quality CONVERT_QUALITY] [--smart-crop] [--force-title FORCE_TITLE]
-                     [--list] [--list-write LIST_WRITE]
+python mangas_get.py [-h] [--login LOGIN] [--force-login] [--password PASSWORD] [--output-folder OUTPUT_FOLDER]
+                     [--output-format {img,cbz,both}] [--config CONFIG] [--from-page FROM_PAGE] [--limit LIMIT]
+                     [--pause PAUSE] [--full-only] [--continue] [--user-agent USER_AGENT]
+                     [--convert-images {webp,jpeg,original}] [--convert-quality CONVERT_QUALITY] [--smart-crop]
+                     [--force-title FORCE_TITLE] [--list] [--list-write LIST_WRITE] [--infos] [--version]
                      [url]
 
 Script pour sauvegarder une BD Mangas.io.
@@ -17,7 +19,7 @@ Script pour sauvegarder une BD Mangas.io.
 positional arguments:
   url                   L'URL de la BD à récupérer ou le chemin vers un fichier local contenant une liste d'URLs
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --login LOGIN, -l LOGIN
                         L'identifiant (email) sur le site
@@ -26,7 +28,7 @@ optional arguments:
                         Le mot de passe sur le site
   --output-folder OUTPUT_FOLDER, -o OUTPUT_FOLDER
                         Répertoire racine de téléchargement
-  --output-format {cbz,img,both}, -f {cbz,img,both}
+  --output-format {img,cbz,both}, -f {img,cbz,both}
                         Format de sortie
   --config CONFIG       Fichier de configuration
   --from-page FROM_PAGE
@@ -37,7 +39,7 @@ optional arguments:
   --continue            Pour reprendre là où on en était. Par défaut, on écrase les fichiers existants.
   --user-agent USER_AGENT
                         User agent à utiliser
-  --convert-images {webp,original,jpeg}
+  --convert-images {webp,jpeg,original}
                         Conversion en JPEG ou WEBP
   --convert-quality CONVERT_QUALITY
                         Qualité de la conversion en JPEG ou WEBP
@@ -46,7 +48,10 @@ optional arguments:
                         Le titre à utiliser dans les noms de fichier, à la place de celui trouvé sur la page
   --list                Liste les URLs des chapitres disponibles (option exclusive)
   --list-write LIST_WRITE
-                        Liste les URLs des chapitres disponibles et les enregistre dans un fichier texte (option exclusive)
+                        Liste les URLs des chapitres disponibles et les enregistre dans un fichier texte (option
+                        exclusive)
+  --infos               Affiche les informations sur la BD (option exclusive)
+  --version             Affiche la version du script
 ```
 
 ### Exemples  
@@ -58,17 +63,19 @@ python mangas_get.py https://www.mangas.io/lire/naruto/1/1
 
 Pour récupérer la BD dans une archive CBZ uniquement, en forçant le titre (fichier de config présent) :  
 ```
-python mangas_get.py https://www.mangas.io/lire/naruto/1/1 --output-format cbz --force-title "Naruto - Tome 01, Chapitre 01"
+python mangas_get.py https://www.mangas.io/lire/naruto/1/1 --output-format cbz --force-title "%title%/%title% - Tome %volume_2d%/%title% Chapitre %chapter_3d%"
 ```
+Cette commande enregistrera les fichiers dans un répertoire "Naruto/Naruto - Tome 01" avec comme préfixe de nom "Naruto Chapitre 001". 
+On peut utiliser les tags `%title%`, `%author%`, `%volume%`, `%volume_2d%`, `%volume_3d%`, `%chapter%`, `%chapter_2d%`, `%chapter_3d%`, `%chapter_title%`. 
 
 Pour récupérer la BD dans une archive CBZ uniquement, avec des images converties en JPEG (fichier de config présent) :  
 ```
 python mangas_get.py https://www.mangas.io/lire/naruto/1/1 --output-format cbz --convert-images jpeg --convert-quality 70
 ```
 
-Pour récuper la liste de toutes les URLs d'une série et la stocker dans un fichier : 
+Pour récuper la liste de toutes les URLs d'une série et la stocker dans un fichier et forcer le nom avec un template particulier : 
 ```
-python mangas_get.py https://www.mangas.io/lire/naruto --list-write naruto.txt
+python mangas_get.py https://www.mangas.io/lire/naruto --list-write naruto.txt --force-title "%title%/%title% - Volume %volume_2d%/%title% %volume_2d% - Chapitre %chapter_3d%. %chapter_title%"
 ```
 
 Pour télécharger toutes les BD listées dans un fichier : 
@@ -76,6 +83,28 @@ Pour télécharger toutes les BD listées dans un fichier :
 python mangas_get.py naruto.txt 
 ```
 
+Pour voir les informations d'un chapitre : 
+```
+python mangas_get.py https://www.mangas.io/lire/naruto --infos
+```
+retournera 
+> Champ                      Tag              Valeur
+> -------------------------  ---------------  -------------------------------------------
+> URL                        %url%            https://www.mangas.io/lire/naruto/1/1
+> Slug                       %slug%           naruto
+> Titre                      %title%          Naruto
+> Sens de lecture            %direction%      rtol
+> Auteur                     %author%         KISHIMOTO Masashi
+> Volume                     %volume%         1
+> Volume                     %volume_2d%      01
+> Volume                     %volume_3d%      001
+> Numéro de chapitre         %chapter%        1
+> Numéro de chapitre         %chapter_2d%     01
+> Numéro de chapitre         %chapter_3d%     001
+> Chapitre                   %chapter_title%  Chap.01 : Naruto Uzumaki !!
+> Nombre de pages            %pages%          55
+> Nom du fichier par défaut  %default%        Naruto - 01x01. Chap.01 : Naruto Uzumaki !!
+> Description : Naruto est un garçon un peu spécial. Il est toujours tout seul et son caractère fougueux ne l'aide pas vraiment à se faire apprécier dans son village. Malgré cela, il garde au fond de lui une ambition: celle de devenir un maître Hokage, la plus haute distinction dans l'ordre des ninjas, et ainsi obtenir la reconnaissance de ses pairs...
 
 
 ## Installation

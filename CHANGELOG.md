@@ -3,7 +3,7 @@
 ## 1.03.00 (2022-05-24)
 - [NEW] Affichage de la version avec `--version`. 
 - [NEW] Affichage des infos avec `--infos`. 
-
+- [UPDATE] Utilisation d'un template de nom de fichier avec `--force-title`.
 
 ## 1.02.01 (2022-05-22)
 - [NEW] Option `--force-login` permet de forcer une authentification pour mettre à jour le token. 

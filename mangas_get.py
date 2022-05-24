@@ -237,13 +237,13 @@ if __name__ == "__main__":
 
         if get_list:
             slug = url.split("/")[-1]
-            scraper.get_chapter_list(slug)
+            scraper.get_chapter_list(slug, force_title=force_title)
             continue
         if get_list_file:
             slug = url.split("/")[-1]
             if os.path.isfile(get_list_file):
                 os.remove(get_list_file)
-            scraper.get_chapter_list(slug, get_list_file)
+            scraper.get_chapter_list(slug, get_list_file, force_title=force_title)
             print(f"Fichier \"{get_list_file}\" créé.")
             continue
         result = scraper.download(
