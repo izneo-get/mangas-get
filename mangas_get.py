@@ -7,7 +7,7 @@ import sys
 import shutil
 import requests
 
-__VERSION__ = "1.02.01"
+__VERSION__ = "1.03.00"
 
 def check_version():
     latest_version_url = (
@@ -139,10 +139,18 @@ if __name__ == "__main__":
         default=None,
         help="Liste les URLs des chapitres disponibles et les enregistre dans un fichier texte (option exclusive)",
     )
+    parser.add_argument(
+        "--version",
+        action="store_true",
+        default=False,
+        help="Affiche la version du script",
+    )
     args = parser.parse_args()
 
     # Vérification que c'est la dernière version.
     check_version()
+    if args.version:
+        sys.exit(0)
 
     # Lecture de la config.
     config = configparser.RawConfigParser()
