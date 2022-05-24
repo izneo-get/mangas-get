@@ -7,7 +7,7 @@ from getpass import getpass
 from urllib.parse import urlparse
 import sys
 import time
-
+from tabulate import tabulate
 
 class MangasIoScraper(Scraper):
     """
@@ -26,6 +26,7 @@ class MangasIoScraper(Scraper):
     rtl: bool = False  # Sens de la lecture de droite à gauche
     authors: list = []  # Auteurs
     pages: dict = {}  # Informations sur les pages du tome
+    infos: list = []  # Informations générales sur le chapitre
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0",
         "Accept": "*/*",
@@ -176,6 +177,23 @@ class MangasIoScraper(Scraper):
 
         return title_used
 
+    def print_infos(self, url):
+        self.url = url
+        res = re.search("https://www.mangas.io/lire/([^/]+)/([\d\.]+)", self.url)
+        if not res:
+            print("URL invalide")
+            return False
+        self.slug, self.chapter_nb = res.groups()
+        self.chapter_nb = float(self.chapter_nb)
+
+        self.get_pages()
+
+        print(tabulate(self.infos, headers=['Champ', 'Tag', 'Valeur']))
+        print("Description :", self.volume_description)
+
+        return True
+
+
     def download(
         self,
         url,
@@ -246,14 +264,44 @@ class MangasIoScraper(Scraper):
         data = response.json()
         if data:
             self.title = data["data"]["manga"]["title"]
+            self.rtl = data["data"]["manga"]["direction"] == "rtl"
+            self.authors = [author["name"] for author in data["data"]["manga"]["authors"]]
+            chapter_id = data["data"]["manga"]["chapter"]["_id"]
+            volume = None
+            self.volume_number = 0
+            self.volume_description = ""
+            for v in data["data"]["manga"]["volumes"]:
+                for c in v["chapters"]:
+                    if c["_id"] == chapter_id:
+                        volume = v
+                        break
+            if volume:
+                self.volume_number = volume["number"]
+                self.volume_description = volume["description"]
             self.chapter_title = data["data"]["manga"]["chapter"]["title"]
             self.chapter_number = data["data"]["manga"]["chapter"]["number"]
             self.page_count = data["data"]["manga"]["chapter"]["pageCount"]
-            self.rtl = data["data"]["manga"]["direction"] == "rtl"
-            self.authors = [author["name"] for author in data["data"]["manga"]["authors"]]
             self.pages = {}
             if data["data"]["manga"]["chapter"]["pages"]:
                 self.pages = {page["number"]: page["_id"] for page in data["data"]["manga"]["chapter"]["pages"]}
+
+            direction = "rtol" if self.rtl else "ltor"
+            authors = ", ".join(self.authors)
+            self.infos = []
+            self.infos.append(["URL", "%url%", self.url])
+            self.infos.append(["Slug", "%slug%", self.slug])
+            self.infos.append(["Titre", "%title%", self.title])
+            self.infos.append(["Sens de lecture", "%direction%", direction])
+            self.infos.append(["Auteur", "%author%", authors])
+            self.infos.append(["Volume", "%volume%", self.volume_number])
+            self.infos.append(["Volume", "%volume_2d%", f"{self.volume_number:02d}"])
+            self.infos.append(["Volume", "%volume_3d%", f"{self.volume_number:03d}"])
+            self.infos.append(["Numéro de chapitre", "%chapter%", self.chapter_number])
+            self.infos.append(["Numéro de chapitre", "%chapter_2d%", f"{self.chapter_number:02d}"])
+            self.infos.append(["Numéro de chapitre", "%chapter_3d%", f"{self.chapter_number:03d}"])
+            self.infos.append(["Chapitre", "%chapter_title%", self.chapter_title])
+            self.infos.append(["Nombre de pages", "%pages%", self.page_count])
+            self.infos.append(["Nom du fichier par défaut", "", self.get_title()])
         return True
 
     def download_page(

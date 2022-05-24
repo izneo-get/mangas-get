@@ -140,6 +140,12 @@ if __name__ == "__main__":
         help="Liste les URLs des chapitres disponibles et les enregistre dans un fichier texte (option exclusive)",
     )
     parser.add_argument(
+        "--infos",
+        action="store_true",
+        default=False,
+        help="Affiche les informations sur la BD (option exclusive)",
+    )
+    parser.add_argument(
         "--version",
         action="store_true",
         default=False,
@@ -192,6 +198,7 @@ if __name__ == "__main__":
     smart_crop = args.smart_crop
     get_list = args.list
     get_list_file = args.list_write
+    print_infos = args.infos
     
     while not os.path.isfile(url) and not url.lower().startswith("http"):
         url = input("URL de la BD ou fichier : ")
@@ -223,6 +230,10 @@ if __name__ == "__main__":
     for url in url_list:
         force_title = url[1]
         url = url[0]
+
+        if print_infos:
+            scraper.print_infos(url)
+            continue
 
         if get_list:
             slug = url.split("/")[-1]

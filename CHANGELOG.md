@@ -2,6 +2,7 @@
 
 ## 1.03.00 (2022-05-24)
 - [NEW] Affichage de la version avec `--version`. 
+- [NEW] Affichage des infos avec `--infos`. 
 
 
 ## 1.02.01 (2022-05-22)
