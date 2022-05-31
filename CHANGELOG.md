@@ -1,5 +1,8 @@
 # Mangas-get
 
+## 1.03.01 (2022-05-31)
+- [BUGFIX] Problème de chemin quand caractère spécial.
+
 ## 1.03.00 (2022-05-24)
 - [NEW] Affichage de la version avec `--version`. 
 - [NEW] Affichage des infos avec `--infos`. 

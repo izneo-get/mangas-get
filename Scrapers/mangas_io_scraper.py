@@ -266,20 +266,25 @@ class MangasIoScraper(Scraper):
         folder_used = title_used
         if force_title:
             new_title = self.replace_title(force_title)
-            print(
-                'Téléchargement de "'
-                + Scrapers.scraper.clean_name(title_used)
-                + '" en tant que "'
-                + new_title
-                + '"'
-            )
             title_used = new_title.split('/')[-1]
             folder_used = title_used
             if '/' in new_title:
                 folder_used = '/'.join(new_title.split('/')[:-1])
+            title_used = Scrapers.scraper.clean_name(title_used)
+            folder_used = Scrapers.scraper.clean_name(folder_used)
+          
+            print(
+                'Téléchargement de "'
+                + self.get_title()
+                + '" en tant que "'
+                + folder_used + '/' + title_used
+                + '"'
+            )
         else:
             title_used = Scrapers.scraper.clean_name(title_used)
-            print('Téléchargement de "' + title_used + '"')
+            folder_used = Scrapers.scraper.clean_name(folder_used)
+            print('Téléchargement de "' + folder_used + '/' + title_used + '"')
+
         save_path = f"{output_folder}/{folder_used}"
         progress_bar = ""
         for page in self.pages:
