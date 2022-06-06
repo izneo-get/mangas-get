@@ -3,7 +3,6 @@ from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 import re
 import os
-from PIL import Image
 import glob
 import sys
 import shutil
@@ -92,10 +91,10 @@ class Scraper:
         for filename in all_files:
             new_filename = os.path.splitext(filename)[0] + '.' + format
             if not crop:
-                im = Image.open(filename)
-                if format in ("jpeg") and im.mode in ("RGBA", "P"):
-                    im = im.convert("RGB")
-                im.save(new_filename, format, quality=quality)
+                img = cv2.imdecode(
+                    np.fromfile(filename, dtype=np.uint8), cv2.IMREAD_UNCHANGED
+                )
+                Scraper.save_img(img, new_filename, format, quality)
             else:
                 img = Scraper.auto_crop(filename)
                 Scraper.save_img(img, new_filename, format, quality)
