@@ -7,7 +7,7 @@ import sys
 import shutil
 import requests
 
-__VERSION__ = "1.03.01"
+__VERSION__ = "1.03.02"
 
 def check_version():
     latest_version_url = (

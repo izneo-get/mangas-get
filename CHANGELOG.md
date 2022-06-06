@@ -1,5 +1,8 @@
 # Mangas-get
 
+## 1.03.02 (2022-06-06)
+- [BUGFIX] Conversion des images RGBA en jpeg.
+
 ## 1.03.01 (2022-05-31)
 - [BUGFIX] Problème de chemin quand caractère spécial.
 

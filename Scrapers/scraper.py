@@ -93,6 +93,8 @@ class Scraper:
             new_filename = os.path.splitext(filename)[0] + '.' + format
             if not crop:
                 im = Image.open(filename)
+                if format in ("jpeg") and im.mode in ("RGBA", "P"):
+                    im = im.convert("RGB")
                 im.save(new_filename, format, quality=quality)
             else:
                 img = Scraper.auto_crop(filename)
