@@ -10,7 +10,7 @@ import shutil
 import requests
 from enum import Enum, auto
 
-__VERSION__ = "1.04.00"
+__VERSION__ = "1.04.01"
 
 
 def check_version():

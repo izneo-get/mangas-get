@@ -1,6 +1,6 @@
 # Mangas-get
 
-## 1.04.00 (2024-09-21)
+## 1.04.01 (2024-09-21)
 - [NEW] Refacto du code.
 - [BUGFIX] Changement dans une API de Mangas.io.
 
