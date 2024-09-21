@@ -9,6 +9,7 @@ import sys
 import time
 from tabulate import tabulate
 
+
 class MangasIoScraper(Scraper):
     """
     Classe qui permet de gérer le téléchargement d'une BD de Mangas.io.
@@ -43,8 +44,10 @@ class MangasIoScraper(Scraper):
         "Cache-Control": "no-cache",
     }
 
-    def __init__(self, login_email="", password="", user_agent="", force_login=False):
+    def __init__(self) -> None:
         super().__init__()
+
+    def init(self, login_email="", password="", user_agent="", force_login=False):
         self.login_email = login_email
         self.password = password
         if user_agent:
@@ -153,9 +156,12 @@ class MangasIoScraper(Scraper):
                     chapter_number_2 = f"{self.chapter_number:02d}"
                     chapter_number_3 = f"{self.chapter_number:03d}"
                 else:
-                    chapter_number_2 = f"{int(self.chapter_number):02d}" + "." + str(self.chapter_number).split(".")[-1]
-                    chapter_number_3 = f"{int(self.chapter_number):03d}" + "." + str(self.chapter_number).split(".")[-1]
-
+                    chapter_number_2 = (
+                        f"{int(self.chapter_number):02d}" + "." + str(self.chapter_number).split(".")[-1]
+                    )
+                    chapter_number_3 = (
+                        f"{int(self.chapter_number):03d}" + "." + str(self.chapter_number).split(".")[-1]
+                    )
 
                 title_used = self.get_title()
                 direction = "?"
@@ -175,7 +181,7 @@ class MangasIoScraper(Scraper):
                 self.infos.append(["Chapitre", "%chapter_title%", self.chapter_title])
                 self.infos.append(["Nombre de pages", "%pages%", self.page_count])
                 self.infos.append(["Nom du fichier par défaut", "%default%", self.get_title()])
-                
+
                 if force_title:
                     title_used = self.replace_title(force_title)
                 if not outputfile:
@@ -225,7 +231,7 @@ class MangasIoScraper(Scraper):
 
         self.get_pages()
 
-        print(tabulate(self.infos, headers=['Champ', 'Tag', 'Valeur']))
+        print(tabulate(self.infos, headers=["Champ", "Tag", "Valeur"]))
         print("Description :", self.volume_description)
 
         return True
@@ -266,24 +272,18 @@ class MangasIoScraper(Scraper):
         folder_used = title_used
         if force_title:
             new_title = self.replace_title(force_title)
-            title_used = new_title.split('/')[-1]
+            title_used = new_title.split("/")[-1]
             folder_used = title_used
-            if '/' in new_title:
-                folder_used = '/'.join(new_title.split('/')[:-1])
+            if "/" in new_title:
+                folder_used = "/".join(new_title.split("/")[:-1])
             title_used = Scrapers.scraper.clean_name(title_used)
             folder_used = Scrapers.scraper.clean_name(folder_used)
-          
-            print(
-                'Téléchargement de "'
-                + self.get_title()
-                + '" en tant que "'
-                + folder_used + '/' + title_used
-                + '"'
-            )
+
+            print('Téléchargement de "' + self.get_title() + '" en tant que "' + folder_used + "/" + title_used + '"')
         else:
             title_used = Scrapers.scraper.clean_name(title_used)
             folder_used = Scrapers.scraper.clean_name(folder_used)
-            print('Téléchargement de "' + folder_used + '/' + title_used + '"')
+            print('Téléchargement de "' + folder_used + "/" + title_used + '"')
 
         save_path = f"{output_folder}/{folder_used}"
         progress_bar = ""
@@ -309,7 +309,7 @@ class MangasIoScraper(Scraper):
                 "slug": self.slug,
                 "quality": "HD",
             },
-            "query": "query getReadingChapter($slug: String, $chapterNb: Float) {\n  manga(slug: $slug) {\n    _id\n    title\n    contentWarning\n    direction\n    authors {\n      _id\n      name\n      __typename\n    }\n    volumes {\n      _id\n      number\n      description\n      chapters {\n        _id\n        title\n        number\n        isRead\n        isSeparator\n        releaseDate\n        __typename\n      }\n      __typename\n    }\n    chapter(number: $chapterNb) {\n      _id\n      number\n      title\n      releaseDate\n      pageCount\n      access\n      copyright\n      pages {\n        _id\n        isDoublePage\n        number\n        image {\n          meta {\n            width\n            height\n            blurhash\n            ratio\n            __typename\n          }\n          __typename\n        }\n        __typename\n      }\n      next {\n        _id\n        title\n        number\n        releaseDate\n        access\n        __typename\n      }\n      previous {\n        _id\n        title\n        number\n        pageCount\n        releaseDate\n        access\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}",
+            "query": "query getReadingChapter($slug: String, $chapterNb: Float) {\n  manga(slug: $slug) {\n    _id\n    title\n    contentWarning\n    direction\n    authors {\n      _id\n      name\n      __typename\n    }\n    volumes {\n      _id\n      number\n      description\n      chapters {\n        _id\n        title\n        number\n        isRead\n        isSeparator\n        releaseDate\n        __typename\n      }\n      __typename\n    }\n    chapter(number: $chapterNb) {\n      _id\n      number\n      title\n      releaseDate\n      pageCount\n      access\n      copyright\n      pages {\n        _id\n        isDoublePage\n        number\n        image {\n          meta {\n            width\n            height\n            ratio\n            __typename\n          }\n          __typename\n        }\n        __typename\n      }\n      next {\n        _id\n        title\n        number\n        releaseDate\n        access\n        __typename\n      }\n      previous {\n        _id\n        title\n        number\n        pageCount\n        releaseDate\n        access\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}",
         }
         response = requests.post("https://api.mangas.io/api", headers=headers, json=json_data, allow_redirects=True)
         if response.status_code != 200:
@@ -319,7 +319,6 @@ class MangasIoScraper(Scraper):
         if data:
             self.fill_infos(data)
         return True
-
 
     def fill_infos(self, data):
         self.title = data["data"]["manga"]["title"]
@@ -357,7 +356,7 @@ class MangasIoScraper(Scraper):
         else:
             chapter_number_2 = f"{int(self.chapter_number):02d}" + "." + str(self.chapter_number).split(".")[-1]
             chapter_number_3 = f"{int(self.chapter_number):03d}" + "." + str(self.chapter_number).split(".")[-1]
-    
+
         direction = "rtol" if self.rtl else "ltor"
         authors = ", ".join(self.authors)
         self.infos = []
