@@ -1,5 +1,5 @@
 from Scrapers.mangas_io_scraper import MangasIoScraper
-from Scrapers.piccoma_com_scraper import PiccomaComScraper
+#from Scrapers.piccoma_com_scraper import PiccomaComScraper
 from Scrapers.scraper import Scraper
 import argparse
 import configparser
