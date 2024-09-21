@@ -1,5 +1,9 @@
 # Mangas-get
 
+## 1.04.00 (2024-09-21)
+- [NEW] Refacto du code.
+- [BUGFIX] Changement dans une API de Mangas.io.
+
 ## 1.03.02 (2022-06-06)
 - [BUGFIX] Conversion des images RGBA en jpeg.
 
