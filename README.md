@@ -1,3 +1,7 @@
+Ce repository n'est plus maintenu.
+Vous pouvez utiliser https://github.com/izneo-get/izneo-get à la place.
+---
+
 # mangas-get
 Ce script permet de récupérer une BD présente sur https://www.mangas.io dans la limite des capacités de notre compte existant.
 
